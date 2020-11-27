@@ -143,6 +143,13 @@
        (show-existing-multiaccount-alert key-uid))
      (navigation/navigate-to-cofx :recover-multiaccount-success nil))))
 
+(fx/defn key-and-storage-management-pressed
+  {:events [::key-and-storage-management-pressed]}
+  [{:keys [db] :as cofx}]
+  (fx/merge
+   cofx
+   (navigation/navigate-to-cofx :multiaccount-key-storage nil)))
+
 (fx/defn enter-phrase-pressed
   {:events [::enter-phrase-pressed]}
   [{:keys [db] :as cofx}]

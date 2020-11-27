@@ -107,6 +107,8 @@
 (reg-root-key-sub :multiaccount :multiaccount)
 (reg-root-key-sub :multiaccount/accounts :multiaccount/accounts)
 (reg-root-key-sub :get-recover-multiaccount :multiaccounts/recover)
+(reg-root-key-sub :multiaccount/move-keystore-checked? :multiaccount/move-keystore-checked?)
+
 ;;chat
 (reg-root-key-sub ::cooldown-enabled? :chat/cooldown-enabled?)
 (reg-root-key-sub ::chats :chats)

@@ -135,6 +135,11 @@
  (fn [cofx _]
    (multiaccounts/confirm-home-tooltip cofx)))
 
+(handlers/register-handler-fx
+ :multiaccounts.ui/key-management-move-keystore-checked?
+ (fn [{:keys [db]} [_ checked?]]
+   {:db (assoc db :multiaccount/move-keystore-checked? checked?)}))
+
 ;; multiaccounts login module
 (handlers/register-handler-fx
  :multiaccounts.login.ui/multiaccount-selected

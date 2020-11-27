@@ -3,6 +3,7 @@
   (:require [status-im.ui.screens.multiaccounts.login.views :as login]
             [status-im.ui.screens.progress.views :as progress]
             [status-im.ui.screens.multiaccounts.views :as multiaccounts]
+            [status-im.ui.screens.multiaccounts.key-storage.views :as key-storage]
             [status-im.ui.screens.intro.views :as intro]
             [status-im.ui.screens.keycard.onboarding.views :as keycard.onboarding]
             [status-im.ui.screens.keycard.recovery.views :as keycard.recovery]
@@ -21,7 +22,7 @@
 (views/defview intro-stack []
   (views/letsubs [multiaccounts [:multiaccounts/multiaccounts]
                   loading [:multiaccounts/loading]]
-    [stack {:header-mode :none}
+                 [stack {:header-mode :none}
      [(cond
         loading
         {:name      :progress-start
@@ -46,6 +47,8 @@
       {:name         :create-multiaccount-select-key-storage
        :back-handler :noop
        :component    intro/wizard-select-key-storage}
+      {:name         :multiaccount-key-storage
+       :component    key-storage/key-storage}
       {:name         :create-multiaccount-create-code
        :back-handler :noop
        :component    password/screen}

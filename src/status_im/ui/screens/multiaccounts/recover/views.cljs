@@ -47,6 +47,13 @@
    [react/view {:flex 1}
     [quo/list-item
      {:theme               :accent
+      :title               (i18n/label :t/manage-keys-and-storage)
+      :accessibility-label :enter-seed-phrase-button
+      :icon                :main-icons/key
+      :on-press            #(hide-sheet-and-dispatch [::multiaccounts.recover/key-and-storage-management-pressed])}]
+
+    [quo/list-item
+     {:theme               :accent
       :title               (i18n/label :t/enter-seed-phrase)
       :accessibility-label :enter-seed-phrase-button
       :icon                :main-icons/text
