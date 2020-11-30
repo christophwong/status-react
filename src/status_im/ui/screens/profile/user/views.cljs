@@ -172,7 +172,7 @@
                                                {:view     :share-chat-key
                                                 :address  public-key
                                                 :ens-name preferred-name}])
-          has-picture     (boolean (get-in account [:profile-picture :url]))]
+          has-picture     @(re-frame/subscribe [:profile/has-picture])]
       [react/view {:flex 1}
        [quo/animated-header
         {:right-accessories [{:accessibility-label :share-header-button

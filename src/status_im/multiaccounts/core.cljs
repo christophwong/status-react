@@ -9,7 +9,6 @@
             [status-im.utils.gfycat.core :as gfycat]
             [status-im.utils.identicon :as identicon]
             [status-im.utils.theme :as utils.theme]
-            [status-im.utils.types :as types]
             [status-im.theme.core :as theme]
             [status-im.utils.utils :as utils]
             [quo.platform :as platform]
@@ -60,11 +59,12 @@
 
 (defn displayed-photo
   "If a photo-path is set use it, otherwise fallback on identicon or generate"
-  [{:keys [profile-picture identicon public-key]}]
-  (or (get profile-picture :url)        ; Optimistic update, show local image while uploading
-      (get profile-picture :uri)
-      identicon
-      (identicon/identicon public-key)))
+  [{:keys [images identicon public-key]}]
+  (if-let [image (first images)]
+    (or (get image :url)
+        (get image :uri))
+    (or identicon
+        (identicon/identicon public-key))))
 
 (re-frame/reg-fx
  ::chaos-mode-changed
@@ -160,27 +160,27 @@
   {:events [::save-profile-picture]}
   [cofx path ax ay bx by]
   (let [key-uid (get-in cofx [:db :multiaccount :key-uid])]
-   (fx/merge cofx
-             {::json-rpc/call [{:method     (json-rpc/call-ext-method "storeIdentityImage")
-                                :params     [key-uid (clean-path path) ax ay bx by]
-                                ;; NOTE: In case of an error we can show a toast error
-                                :on-success #(re-frame/dispatch [::update-local-picture %])}]}
-             (multiaccounts.update/optimistic :profile-picture {:url path})
-             (bottom-sheet/hide-bottom-sheet))))
+    (fx/merge cofx
+              {::json-rpc/call [{:method     "multiaccounts_storeIdentityImage"
+                                 :params     [key-uid (clean-path path) ax ay bx by]
+                                 ;; NOTE: In case of an error we can show a toast error
+                                 :on-success #(re-frame/dispatch [::update-local-picture %])}]}
+              (multiaccounts.update/optimistic :images [{:url path}])
+              (bottom-sheet/hide-bottom-sheet))))
 
 (fx/defn delete-profile-picture
   {:events [::delete-profile-picture]}
   [cofx name]
   (let [key-uid (get-in cofx [:db :multiaccount :key-uid])]
-   (fx/merge cofx
-             {::json-rpc/call [{:method     (json-rpc/call-ext-method "deleteIdentityImage")
-                                :params     [key-uid]
-                                ;; NOTE: In case of an error we could fallback to previous image in UI with a toast error
-                                :on-success #(log/info "[multiaccount] Delete profile image" %)}]}
-             (multiaccounts.update/optimistic :profile-picture {})
-             (bottom-sheet/hide-bottom-sheet))))
+    (fx/merge cofx
+              {::json-rpc/call [{:method     "multiaccounts_deleteIdentityImage"
+                                 :params     [key-uid]
+                                 ;; NOTE: In case of an error we could fallback to previous image in UI with a toast error
+                                 :on-success #(log/info "[multiaccount] Delete profile image" %)}]}
+              (multiaccounts.update/optimistic :images nil)
+              (bottom-sheet/hide-bottom-sheet))))
 
 (fx/defn store-profile-picture
   {:events [::update-local-picture]}
   [cofx pics]
-  (multiaccounts.update/optimistic cofx :profile-picture (first (types/json->clj pics))))
+  (multiaccounts.update/optimistic cofx :images pics))
