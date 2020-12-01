@@ -59,12 +59,21 @@
 
 (defn displayed-photo
   "If a photo-path is set use it, otherwise fallback on identicon or generate"
-  [{:keys [images identicon public-key]}]
-  (if-let [image (first images)]
-    (or (get image :url)
-        (get image :uri))
-    (or identicon
-        (identicon/identicon public-key))))
+  [{:keys [image images identicon public-key]}]
+  (cond
+    (map? image)
+    (get image :uri)
+
+    (pos? (count images))
+    (let [image (first images)]
+      (or (get image :url)
+          (get image :uri)))
+
+    (boolean identicon)
+    identicon
+
+    :else
+    (identicon/identicon public-key)))
 
 (re-frame/reg-fx
  ::chaos-mode-changed
