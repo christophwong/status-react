@@ -1,0 +1,64 @@
+(ns status-im.multiaccounts.key-storage.core
+  (:require [clojure.string :as string]
+            [re-frame.core :as re-frame]
+            [status-im.ethereum.mnemonic :as mnemonic]
+            [status-im.multiaccounts.core :as multiaccounts]
+            [status-im.multiaccounts.model :as multiaccounts.model]
+            [status-im.navigation :as navigation]
+            [status-im.popover.core :as popover]
+            [status-im.utils.fx :as fx]
+            [status-im.utils.security :as security]
+            [status-im.utils.types :as types]))
+
+(fx/defn key-and-storage-management-pressed
+  "This event can be dispatched before login and from profile and needs to redirect accordingly"
+  {:events [::key-and-storage-management-pressed]}
+  [cofx]
+  (fx/merge cofx
+            (navigation/navigate-to-cofx :key-storage-stack
+                                         {:screen (if (multiaccounts.model/logged-in? cofx)
+                                                    :actions-logged-in
+                                                    :actions-not-logged-in)})))
+
+(fx/defn move-keystore-checked
+  {:events [::move-keystore-checked]}
+  [{:keys [db] :as cofx} checked?]
+  {:db (assoc-in db [:multiaccounts/key-storage :move-keystore-checked?] checked?)})
+
+(fx/defn enter-seed-pressed
+  "User is logged out and probably wants to move multiaccount to Keycard. Navigate to enter seed phrase screen"
+  {:events [::enter-seed-pressed]}
+  [cofx]
+  (fx/merge cofx
+            (navigation/navigate-to-cofx :key-storage-stack
+                                         {:screen :seed-phrase})))
+
+(fx/defn seed-phrase-input-changed
+  {:events [::seed-phrase-input-changed]}
+  [{:keys [db]} masked-seed-phrase]
+  (let [seed-phrase (security/safe-unmask-data masked-seed-phrase)]
+    {:db (update db :multiaccounts/key-storage assoc
+                 :seed-phrase (string/lower-case seed-phrase)
+                 :seed-shape-invalid? (or (empty? seed-phrase)
+                                          (not (mnemonic/valid-length? seed-phrase)))
+                 :seed-word-count (mnemonic/words-count seed-phrase))}))
+
+(fx/defn handle-seed-phrase-validation
+  {:events [::seed-phrase-validated]}
+  [{:keys [db] :as cofx} validation-error]
+  (let [error? (-> validation-error
+                   types/json->clj
+                   string/blank?
+                   not)]
+    (if error?
+      (popover/show-popover cofx {:view :custom-seed-phrase})
+      (navigation/navigate-to-cofx :key-storage-stack {:screen :storage}))))
+
+(fx/defn seed-phrase-next-pressed
+  {:events [::seed-phrase-next-pressed]}
+  [{:keys [db] :as cofx}]
+  (let [{:keys [seed-phrase]} (:multiaccounts/key-storage db)]
+    {::multiaccounts/validate-mnemonic [seed-phrase #(re-frame/dispatch [::seed-phrase-validated %])]}))
+
+
+

@@ -27,6 +27,7 @@
             [status-im.multiaccounts.login.core :as multiaccounts.login]
             [status-im.multiaccounts.logout.core :as multiaccounts.logout]
             [status-im.multiaccounts.update.core :as multiaccounts.update]
+            [status-im.multiaccounts.key-storage.core :as multiaccounts.key-storage]
             [status-im.pairing.core :as pairing]
             [status-im.privacy-policy.core :as privacy-policy]
             [status-im.signals.core :as signals]
@@ -135,11 +136,6 @@
  (fn [cofx _]
    (multiaccounts/confirm-home-tooltip cofx)))
 
-(handlers/register-handler-fx
- :multiaccounts.ui/key-management-move-keystore-checked?
- (fn [{:keys [db]} [_ checked?]]
-   {:db (assoc db :multiaccount/move-keystore-checked? checked?)}))
-
 ;; multiaccounts login module
 (handlers/register-handler-fx
  :multiaccounts.login.ui/multiaccount-selected
@@ -164,6 +160,7 @@
  :multiaccounts.update.callback/save-settings-success
  (fn [cofx _]
    (multiaccounts.logout/logout cofx)))
+
 
 ;; mailserver module
 

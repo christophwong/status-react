@@ -263,7 +263,8 @@
                  :size  :small}
        (when-not next-button-disabled?
          "✓ ")
-       (i18n/label-pluralize passphrase-word-count :t/words-n)]]]]
+       (i18n/label-pluralize passphrase-word-count :t/words-n)]]]
+    ]
    [react/view {:align-items :center}
     [react/text {:style {:color         colors/gray
                          :font-size     14
@@ -372,7 +373,7 @@
       [top-bar {:step :enter-phrase}]
       [enter-phrase wizard-state]
       [bottom-bar (merge {:step :enter-phrase
-                          :forward-action  :multiaccounts.recover/enter-phrase-next-pressed}
+                          :forward-action :multiaccounts.recover/enter-phrase-next-pressed}
                          wizard-state)]]]))
 
 (defview wizard-recovery-success []

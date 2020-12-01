@@ -11,6 +11,7 @@
             [status-im.ui.screens.routing.intro-login-stack :as intro-login-stack]
             [status-im.ui.screens.routing.chat-stack :as chat-stack]
             [status-im.ui.screens.routing.wallet-stack :as wallet-stack]
+            [status-im.ui.screens.routing.key-storage-stack :as key-storage-stack]
             [status-im.ui.screens.group.views :as group-chat]
             [status-im.ui.screens.group.events :as group.events]
             [status-im.ui.screens.routing.profile-stack :as profile-stack]
@@ -55,7 +56,7 @@
 
 (views/defview get-main-component [_]
   (views/letsubs [logged-in? [:multiaccount/logged-in?]]
-    [main-stack (merge {:header-mode :none}
+                 [main-stack (merge {:header-mode :none}
                        ;; https://github.com/react-navigation/react-navigation/issues/6520
                        (when platform/ios?
                          {:mode :modal}))
@@ -148,7 +149,10 @@
        {:name       :profile
         :transition :presentation-ios
         :insets     {:bottom true}
-        :component  contact/profile}]
+        :component  contact/profile}
+
+       {:name      :key-storage-stack
+        :component key-storage-stack/key-storage-stack}]
 
       (when config/quo-preview-enabled?
         [{:name      :quo-preview

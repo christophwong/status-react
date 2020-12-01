@@ -3,6 +3,7 @@
   (:require [re-frame.core :as re-frame]
             [status-im.ui.components.react :as react]
             [status-im.multiaccounts.recover.core :as multiaccounts.recover]
+            [status-im.multiaccounts.key-storage.core :as multiaccounts.key-storage]
             [status-im.keycard.recovery :as keycard]
             [status-im.i18n :as i18n]
             [status-im.utils.config :as config]
@@ -50,7 +51,7 @@
       :title               (i18n/label :t/manage-keys-and-storage)
       :accessibility-label :enter-seed-phrase-button
       :icon                :main-icons/key
-      :on-press            #(hide-sheet-and-dispatch [::multiaccounts.recover/key-and-storage-management-pressed])}]
+      :on-press            #(hide-sheet-and-dispatch [::multiaccounts.key-storage/key-and-storage-management-pressed])}]
 
     [quo/list-item
      {:theme               :accent

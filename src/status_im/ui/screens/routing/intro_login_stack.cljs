@@ -47,8 +47,6 @@
       {:name         :create-multiaccount-select-key-storage
        :back-handler :noop
        :component    intro/wizard-select-key-storage}
-      {:name         :multiaccount-key-storage
-       :component    key-storage/key-storage}
       {:name         :create-multiaccount-create-code
        :back-handler :noop
        :component    password/screen}

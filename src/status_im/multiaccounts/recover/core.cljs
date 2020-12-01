@@ -6,6 +6,7 @@
             [status-im.ethereum.mnemonic :as mnemonic]
             [status-im.keycard.nfc :as nfc]
             [status-im.i18n :as i18n]
+            [status-im.multiaccounts.core :as multiaccounts]
             [status-im.multiaccounts.create.core :as multiaccounts.create]
             [status-im.native-module.core :as status]
             [status-im.popover.core :as popover]
@@ -23,11 +24,6 @@
   [multiaccounts key-uid]
   {:pre [(not (nil? key-uid))]}
   (contains? multiaccounts key-uid))
-
-(re-frame/reg-fx
- ::validate-mnemonic
- (fn [[passphrase callback]]
-   (status/validate-mnemonic passphrase callback)))
 
 (defn check-phrase-warnings [recovery-phrase]
   (cond (string/blank? recovery-phrase) :t/required-field))
@@ -143,13 +139,6 @@
        (show-existing-multiaccount-alert key-uid))
      (navigation/navigate-to-cofx :recover-multiaccount-success nil))))
 
-(fx/defn key-and-storage-management-pressed
-  {:events [::key-and-storage-management-pressed]}
-  [{:keys [db] :as cofx}]
-  (fx/merge
-   cofx
-   (navigation/navigate-to-cofx :multiaccount-key-storage nil)))
-
 (fx/defn enter-phrase-pressed
   {:events [::enter-phrase-pressed]}
   [{:keys [db] :as cofx}]
@@ -182,7 +171,7 @@
   {:events [:multiaccounts.recover/enter-phrase-next-pressed]}
   [{:keys [db] :as cofx}]
   (let [{:keys [passphrase]} (:intro-wizard db)]
-    {::validate-mnemonic [passphrase #(re-frame/dispatch [:multiaccounts.recover/phrase-validated %])]}))
+    {::multiaccounts/validate-mnemonic [passphrase #(re-frame/dispatch [:multiaccounts.recover/phrase-validated %])]}))
 
 (fx/defn continue-to-import-mnemonic
   {:events [::continue-pressed]}

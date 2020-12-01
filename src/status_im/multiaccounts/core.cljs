@@ -12,6 +12,11 @@
             [quo.platform :as platform]
             [clojure.string :as string]))
 
+(re-frame/reg-fx
+ ::validate-mnemonic
+ (fn [[passphrase callback]]
+   (native-module/validate-mnemonic passphrase callback)))
+
 (defn contact-names
   "Returns map of all existing names for contact"
   [{:keys [name preferred-name alias public-key ens-verified nickname]}]
