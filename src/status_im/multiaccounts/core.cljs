@@ -180,6 +180,13 @@
               (multiaccounts.update/optimistic :images nil)
               (bottom-sheet/hide-bottom-sheet))))
 
+(fx/defn get-profile-picture
+  [cofx]
+  (let [key-uid (get-in cofx [:db :multiaccount :key-uid])]
+    {::json-rpc/call [{:method     "multiaccounts_getIdentityImages"
+                       :params     [key-uid]
+                       :on-success #(re-frame/dispatch [::update-local-picture %])}]}))
+
 (fx/defn store-profile-picture
   {:events [::update-local-picture]}
   [cofx pics]

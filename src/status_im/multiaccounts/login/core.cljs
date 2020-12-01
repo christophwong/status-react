@@ -227,6 +227,7 @@
               (mobile-network/on-network-status-change)
               (get-group-chat-invitations)
               (logging/set-log-level (:log-level multiaccount))
+              (multiaccounts/get-profile-picture)
               (multiaccounts/switch-preview-privacy-mode-flag)
               (link-preview/request-link-preview-whitelist))))
 
