@@ -19,7 +19,6 @@
             [status-im.ui.screens.mobile-network-settings.events :as mobile-network]
             [status-im.navigation :as navigation]
             [status-im.utils.fx :as fx]
-            [status-im.utils.identicon :as identicon]
             [status-im.utils.keychain.core :as keychain]
             [status-im.utils.logging.core :as logging]
             [status-im.utils.security :as security]
@@ -343,11 +342,7 @@
 (fx/defn open-login
   [{:keys [db] :as cofx} {:keys [key-uid] :as multiaccount}]
   (fx/merge cofx
-            {:db (-> db
-                     (update :multiaccounts/login merge multiaccount)
-                     (update :multiaccounts/login dissoc
-                             :error
-                             :password))}
+            {:db (assoc db :multiaccounts/login multiaccount)}
             (keychain/get-auth-method key-uid)))
 
 (fx/defn open-login-callback
