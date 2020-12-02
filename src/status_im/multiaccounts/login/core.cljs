@@ -338,16 +338,13 @@
                 (navigation/navigate-to-cofx :tabs {:screen :chat-stack
                                                     :params {:screen :home}})))))
 
+;; FIXME(Ferossgp): We should not copy keys as we denormalize the database,
+;; this create desync between actual accounts and the one on login causing broken state
 (fx/defn open-login
-  [{:keys [db] :as cofx} key-uid photo-path name public-key]
+  [{:keys [db] :as cofx} {:keys [key-uid] :as multiaccount}]
   (fx/merge cofx
             {:db (-> db
-                     (update :multiaccounts/login assoc
-                             :public-key public-key
-                             :key-uid key-uid
-                             :photo-path photo-path
-                             :name name)
-                     (assoc :profile/photo-added? (= (identicon/identicon public-key) photo-path))
+                     (update :multiaccounts/login merge multiaccount)
                      (update :multiaccounts/login dissoc
                              :error
                              :password))}

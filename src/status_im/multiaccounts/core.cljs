@@ -58,8 +58,8 @@
       (or alias (gfycat/generate-gfy public-key)))))
 
 (defn displayed-photo
-  "If a photo-path is set use it, otherwise fallback on identicon or generate"
-  [{:keys [image images identicon public-key]}]
+  "If a photo, a image or an images array is set use it, otherwise fallback on identicon or generate"
+  [{:keys [image images photo-path identicon public-key]}]
   (cond
     (map? image)
     (get image :uri)
@@ -68,6 +68,9 @@
     (let [image (first images)]
       (or (get image :url)
           (get image :uri)))
+
+    (boolean photo-path)
+    photo-path
 
     (boolean identicon)
     identicon
