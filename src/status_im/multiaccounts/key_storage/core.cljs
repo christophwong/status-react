@@ -48,17 +48,27 @@
   [{:keys [db] :as cofx} validation-error]
   (let [error? (-> validation-error
                    types/json->clj
+                   :error
                    string/blank?
                    not)]
     (if error?
       (popover/show-popover cofx {:view :custom-seed-phrase})
-      (navigation/navigate-to-cofx :key-storage-stack {:screen :storage}))))
+      (fx/merge cofx
+                (navigation/navigate-to-cofx :key-storage-stack {:screen :storage})))))
 
 (fx/defn seed-phrase-next-pressed
   {:events [::seed-phrase-next-pressed]}
   [{:keys [db] :as cofx}]
   (let [{:keys [seed-phrase]} (:multiaccounts/key-storage db)]
-    {::multiaccounts/validate-mnemonic [seed-phrase #(re-frame/dispatch [::seed-phrase-validated %])]}))
+    {::multiaccounts/validate-mnemonic [(mnemonic/sanitize-passphrase seed-phrase) #(re-frame/dispatch [::seed-phrase-validated %])]}))
 
+(fx/defn keycard-storage-pressed
+  {:events [::keycard-storage-pressed]}
+  [{:keys [db]} selected?]
+  {:db (assoc-in db [:multiaccounts/key-storage :keycard-storage-selected?] selected?)})
+
+(comment
+  (mnemonic/sanitize-passphrase "rocket rebel pasta kimchi kitty nani tokyo")
+  )
 
 

@@ -88,7 +88,6 @@
                         :icon                [react/image {:source      {:uri (identicon/identicon public-key)}
                                                            :resize-mode :cover
                                                            :style       styles/multiaccount-image}]}]))]])
-
 (defn storage-entry [{:keys [type icon icon-width icon-height
                              image image-selected image-width image-height
                              title desc]} selected-storage-type]
