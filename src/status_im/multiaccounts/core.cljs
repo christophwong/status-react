@@ -12,6 +12,7 @@
             [quo.platform :as platform]
             [clojure.string :as string]))
 
+;; validate that the given mnemonic was generated from Status Dictionary
 (re-frame/reg-fx
  ::validate-mnemonic
  (fn [[passphrase callback]]

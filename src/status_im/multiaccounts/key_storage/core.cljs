@@ -44,7 +44,30 @@
                                           (not (mnemonic/valid-length? seed-phrase)))
                  :seed-word-count (mnemonic/words-count seed-phrase))}))
 
-(fx/defn handle-seed-phrase-validation
+
+(fx/defn key-uid-seed-mismatch
+  {:events [::show-seed-key-uid-mismatch-error-popup]}
+  [cofx _]
+  (popover/show-popover cofx {:view :custom-seed-phrase}))
+
+(defn validate-seed-against-key-uid
+  "Check if the key-uid was generated with the given seed-phrase"
+  [{:keys [seed-phrase key-uid]}]
+  (native-module/multiaccount-import-mnemonic
+   seed-phrase nil
+   (fn [result]
+     (let [{:keys [keyUid]} (types/json->clj result)]
+       ;; if the key-uid from app-db is same as the one returned by multiaccount import,
+       ;; it means that this seed was used to generate this multiaccount
+       (if (= key-uid keyUid)
+         (re-frame/dispatch [:navigate-to :storage])
+         (re-frame/dispatch [::show-seed-key-uid-mismatch-error-popup]))))))
+
+(re-frame/reg-fx
+ ::validate-seed-against-key-uid
+ validate-seed-against-key-uid)
+
+(fx/defn seed-phrase-validated
   {:events [::seed-phrase-validated]}
   [{:keys [db] :as cofx} validation-error]
   (let [error? (-> validation-error
@@ -54,14 +77,22 @@
                    not)]
     (if error?
       (popover/show-popover cofx {:view :custom-seed-phrase})
-      (fx/merge cofx
-                (navigation/navigate-to-cofx :key-storage-stack {:screen :storage})))))
+      {::validate-seed-against-key-uid {:seed-phrase (-> db :multiaccounts/key-storage :seed-phrase)
+                                        ;; Unique key-uid of the account for which we are going to move keys
+                                        :key-uid (-> db :multiaccounts/login :key-uid)}})))
 
-(fx/defn seed-phrase-next-pressed
-  {:events [::seed-phrase-next-pressed]}
+(comment
+      (fx/merge cofx
+                (navigation/navigate-to-cofx :key-storage-stack {:screen :storage}))
+  )
+
+(fx/defn choose-storage-pressed
+  {:events [::choose-storage-pressed]}
   [{:keys [db] :as cofx}]
   (let [{:keys [seed-phrase]} (:multiaccounts/key-storage db)]
-    {::multiaccounts/validate-mnemonic [(mnemonic/sanitize-passphrase seed-phrase) #(re-frame/dispatch [::seed-phrase-validated %])]}))
+    {::multiaccounts/validate-mnemonic
+     [(mnemonic/sanitize-passphrase seed-phrase)
+      #(re-frame/dispatch [::seed-phrase-validated %])]}))
 
 (fx/defn keycard-storage-pressed
   {:events [::keycard-storage-pressed]}
@@ -87,7 +118,9 @@
 
 (comment
   (mnemonic/sanitize-passphrase "rocket rebel pasta kimchi kitty nani tokyo")
-  (native-module/multiaccount-import-mnemonic "rocket mixed rebel affair umbrella legal resemble scene virus park deposit cargo" nil prn)
+  (native-module/multiaccount-import-mnemonic "rocket mixed rebel affair umbrella legal resemble scene virus park deposit cargo" nil
+                                              (fn [result]
+                                                (prn (types/json->clj result))))
   )
 
 

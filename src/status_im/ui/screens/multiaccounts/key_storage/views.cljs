@@ -89,7 +89,7 @@
                       :right        [quo/button
                                      {:type     :secondary
                                       :disabled seed-shape-invalid?
-                                      :on-press #(re-frame/dispatch [::multiaccounts.key-storage/seed-phrase-next-pressed])
+                                      :on-press #(re-frame/dispatch [::multiaccounts.key-storage/choose-storage-pressed])
                                       :after    :main-icons/next}
                                      "Choose storage"]}]]))
 
@@ -159,6 +159,39 @@
                                        :on-press #(re-frame/dispatch [::multiaccounts.key-storage/transfer-to-keycard-confirmed])}
                                       "Confirm"]}]]]))
 
+(defview seed-key-uid-mistmatch-popup []
+  [react/view
+   [react/view {:margin-top        24
+                :margin-horizontal 24
+                :align-items       :center}
+    [react/view {:width           32
+                 :height          32
+                 :border-radius   16
+                 :align-items     :center
+                 :justify-content :center}
+     [vector-icons/icon :main-icons/help {:color colors/blue}]]
+    [react/text {:style {:typography    :title-bold
+                         :margin-top    8
+                         :margin-bottom 8}}
+     (i18n/label :t/custom-seed-phrase)]
+    [react/view {:flex-wrap       :wrap
+                 :flex-direction  :row
+                 :justify-content :center
+                 :text-align      :center}
+     [react/nested-text
+      {:style {:color       colors/gray
+               :text-align  :center
+               :line-height 22}}
+      ;; (i18n/label :t/custom-seed-phrase-text-1)
+      "ya didn't use this seed to generate this multiaccount, you tryna fool mahself or yaself"
+      ]]
+    [react/view {:margin-vertical 24
+                 :align-items     :center}
+     [quo/button {:on-press            #(re-frame/dispatch [:hide-popover])
+                  :accessibility-label :cancel-custom-seed-phrase
+                  :type                :secondary}
+      (i18n/label :t/cancel)]]]])
+
 (comment
   (-> re-frame.db/app-db deref keys)
   (-> re-frame.db/app-db deref
@@ -183,15 +216,20 @@
     ;; Enter seed phrase
     ;; status-im.utils.security is not explictly required because I know that it will be loaded by multiaccounts.views ns, hacky but works
 
-    ;; invalid seed
-    ;; (re-frame/dispatch [::multiaccounts.key-storage/seed-phrase-input-changed (status-im.utils.security/mask-data "h h h h h h h h h h h h")])
+    ;; invalid seed shape
+    #_(re-frame/dispatch [::multiaccounts.key-storage/seed-phrase-input-changed (status-im.utils.security/mask-data "h h h h h h h h h h h h")])
+
+    ;; valid seed for Trusty Candid Bighornedsheep
+    ;; If you try to select Dim Venerated Yaffle, but use this seed instead, validate-seed-against-key-uid will fail miserably
+    (re-frame/dispatch [::multiaccounts.key-storage/seed-phrase-input-changed
+                        (status-im.utils.security/mask-data "disease behave roof exile ghost head carry item tumble census rocket champion")])
 
     ;; valid seed for Dim Venerated Yaffle (this is just a test account, okay to leak seed)
     (re-frame/dispatch [::multiaccounts.key-storage/seed-phrase-input-changed
                         (status-im.utils.security/mask-data "rocket mixed rebel affair umbrella legal resemble scene virus park deposit cargo")])
 
     ;; Click choose storage
-    (re-frame/dispatch [::multiaccounts.key-storage/seed-phrase-next-pressed])
+    (re-frame/dispatch [::multiaccounts.key-storage/choose-storage-pressed])
 
     ;; Choose Keycard from storage options
     (re-frame/dispatch [::multiaccounts.key-storage/keycard-storage-pressed true])
