@@ -150,12 +150,13 @@
                      :accessory          :radio}]]
     [react/view {:flex            1
                  :justify-content :flex-end}
-     [keycard-upsell-banner]
+     (when-not keycard-storage-selected?
+       [keycard-upsell-banner])
      [toolbar/toolbar {:show-border? true
                        :right        [quo/button
                                       {:type     :secondary
                                        :disabled (not keycard-storage-selected?)
-                                       :on-press #(re-frame/dispatch [::multiaccounts.key-storage/seed-phrase-next-pressed])}
+                                       :on-press #(re-frame/dispatch [::multiaccounts.key-storage/transfer-to-keycard-confirmed])}
                                       "Confirm"]}]]]))
 
 (comment
@@ -191,5 +192,11 @@
 
     ;; Click choose storage
     (re-frame/dispatch [::multiaccounts.key-storage/seed-phrase-next-pressed])
+
+    ;; Choose Keycard from storage options
+    (re-frame/dispatch [::multiaccounts.key-storage/keycard-storage-pressed true])
+
+    ;; Confirm migration
+    (re-frame/dispatch [::multiaccounts.key-storage/transfer-to-keycard-confirmed])
     )
   )

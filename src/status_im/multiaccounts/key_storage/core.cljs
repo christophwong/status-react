@@ -4,6 +4,7 @@
             [status-im.ethereum.mnemonic :as mnemonic]
             [status-im.multiaccounts.core :as multiaccounts]
             [status-im.multiaccounts.model :as multiaccounts.model]
+            [status-im.native-module.core :as native-module]
             [status-im.navigation :as navigation]
             [status-im.popover.core :as popover]
             [status-im.utils.fx :as fx]
@@ -67,8 +68,26 @@
   [{:keys [db]} selected?]
   {:db (assoc-in db [:multiaccounts/key-storage :keycard-storage-selected?] selected?)})
 
+(re-frame/reg-fx
+ ::validate-pub-key-derived-from-seed
+ (fn [{:keys [seed-phrase public-key success-event error-event]}]
+   (re-frame/dispatch
+    (if (native-module/validate-pub-key-derived-from-seed seed-phrase public-key)
+      success-event error-event))))
+
+
+(fx/defn validate-seed-generated-public-key
+  {:events [::validate-seed-generated-public-key]}
+  [_ seed-phrase public-key]
+  {::validate-pub-key-derived-from-seed {:seed-phrase seed-phrase
+                                         :public-key public-key
+                                         :success-event [::seed-integrity-verified]
+                                         :error-event [::seed-invalid]}})
+
+
 (comment
   (mnemonic/sanitize-passphrase "rocket rebel pasta kimchi kitty nani tokyo")
+  (native-module/multiaccount-import-mnemonic "rocket mixed rebel affair umbrella legal resemble scene virus park deposit cargo" nil prn)
   )
 
 

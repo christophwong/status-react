@@ -398,3 +398,15 @@
   (log/debug "[native-module] resetKeyboardInput")
   (when platform/android?
     (.resetKeyboardInputCursor ^js (status) input selection)))
+
+
+(defn validate-pub-key-derived-from-seed
+  "Check if the given seed phrase was used to derive the public key(:m/43'/60'/1581'/0'/0) in question."
+  [seed-phrase public-key]
+  ;; TODO(shivekkhurana): Implement this bad boy
+  (boolean (and seed-phrase public-key)))
+
+(comment
+  (validate-pub-key-derived-from-seed true true)
+
+  )
