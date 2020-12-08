@@ -79,3 +79,37 @@
 
 (def bottom-sheet
   {:content bottom-sheet-view})
+
+(comment
+  ;; Recover with seed to device UI flow
+  (do
+    
+    ;; Press get-started on welcome screen
+    (re-frame/dispatch [:multiaccounts.create.ui/intro-wizard])
+
+    ;; Goto seed screen
+    (re-frame/dispatch [::multiaccounts.recover/enter-phrase-pressed])
+
+    ;; Enter seed phrase for Dim Venerated Yaffle
+    (re-frame/dispatch [:multiaccounts.recover/enter-phrase-input-changed
+                        (status-im.utils.security/mask-data "rocket mixed rebel affair umbrella legal resemble scene virus park deposit cargo")])
+
+    ;; Recover multiaccount
+    (re-frame/dispatch [:multiaccounts.recover/enter-phrase-next-pressed])
+
+    ;; Press Re-encrypt
+    (re-frame/dispatch [:multiaccounts.recover/re-encrypt-pressed])
+
+    ;; Press next on default storage (ie store on device)
+    (re-frame/dispatch [:multiaccounts.recover/select-storage-next-pressed])
+
+    ;; Enter password (need to wait for a moment for this to finish)
+    (re-frame/dispatch [:multiaccounts.recover/enter-password-next-pressed {:key-code "111111"}])
+
+    ;; Turn notifications later
+    (re-frame/dispatch [:navigate-to :welcome])
+
+    ;; Logout
+    (re-frame/dispatch [:multiaccounts.logout.ui/logout-confirmed])
+    )
+  )

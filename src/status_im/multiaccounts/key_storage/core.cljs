@@ -3,6 +3,7 @@
             [re-frame.core :as re-frame]
             [status-im.ethereum.mnemonic :as mnemonic]
             [status-im.multiaccounts.core :as multiaccounts]
+            [status-im.multiaccounts.recover.core :as multiaccounts.recover]
             [status-im.multiaccounts.model :as multiaccounts.model]
             [status-im.native-module.core :as native-module]
             [status-im.navigation :as navigation]
@@ -48,7 +49,7 @@
 (fx/defn key-uid-seed-mismatch
   {:events [::show-seed-key-uid-mismatch-error-popup]}
   [cofx _]
-  (popover/show-popover cofx {:view :custom-seed-phrase}))
+  (popover/show-popover cofx {:view :seed-key-uid-mismatch}))
 
 (defn validate-seed-against-key-uid
   "Check if the key-uid was generated with the given seed-phrase"
@@ -81,11 +82,6 @@
                                         ;; Unique key-uid of the account for which we are going to move keys
                                         :key-uid (-> db :multiaccounts/login :key-uid)}})))
 
-(comment
-      (fx/merge cofx
-                (navigation/navigate-to-cofx :key-storage-stack {:screen :storage}))
-  )
-
 (fx/defn choose-storage-pressed
   {:events [::choose-storage-pressed]}
   [{:keys [db] :as cofx}]
@@ -99,28 +95,82 @@
   [{:keys [db]} selected?]
   {:db (assoc-in db [:multiaccounts/key-storage :keycard-storage-selected?] selected?)})
 
+(fx/defn warning-popup
+  {:events [::show-transfer-warning-popup]}
+  [cofx]
+  (popover/show-popover cofx {:view :transfer-multiaccount-to-keycard-warning}))
+
 (re-frame/reg-fx
- ::validate-pub-key-derived-from-seed
- (fn [{:keys [seed-phrase public-key success-event error-event]}]
-   (re-frame/dispatch
-    (if (native-module/validate-pub-key-derived-from-seed seed-phrase public-key)
-      success-event error-event))))
+ ::delete-multiaccount
+ (fn [{:keys [key-uid on-success on-error]}]
+   (native-module/delete-multiaccount
+    key-uid
+    (fn [result]
+      (let [{:keys [error]} (types/json->clj result)]
+        (if-not (string/blank? error)
+          (on-error error)
+          (on-success)))))))
 
+(fx/defn delete-multiaccount-and-init-keycard-onboarding
+  {:events [::delete-multiaccount-and-init-keycard-onboarding]}
+  [{:keys [db] :as cofx}]
+  (let [{:keys [key-uid]} (-> db :multiaccounts/login)]
+    {::delete-multiaccount {:key-uid key-uid
+                            :on-error #(re-frame/dispatch [::delete-multiaccount-error %])
+                            :on-success #(re-frame/dispatch [::delete-multiaccount-success])}}))
 
-(fx/defn validate-seed-generated-public-key
-  {:events [::validate-seed-generated-public-key]}
-  [_ seed-phrase public-key]
-  {::validate-pub-key-derived-from-seed {:seed-phrase seed-phrase
-                                         :public-key public-key
-                                         :success-event [::seed-integrity-verified]
-                                         :error-event [::seed-invalid]}})
+#_"Multiaccount has been deleted from device. We now need to emulate the restore seed phrase process, and make the user land on Keycard setup screen.
+To ensure that keycard setup works, we need to:
+1. Import multiaccount, derive required keys and save them at the correct location in app-db
+2. Take the user to :keycard-onboarding-intro screen in :intro-login-stack
 
+The exact events dispatched for this flow if consumed from the UI are:
+:m.r/enter-phrase-input-changed
+:m.r/enter-phrase-next-pressed
+:m.r/re-encrypt-pressed
+:i/on-key-storage-selected ([:intro-wizard :selected-storage-type] is set to :advanced)
+:m.r/select-storage-next-pressed
+
+We don't need to take the exact steps, just set the required state and redirect to correct screen
+"
+(fx/defn handle-delete-multiaccount-success
+  {:events [::delete-multiaccount-success]}
+  [{:keys [db] :as cofx} _]
+  (fx/merge cofx
+            {::multiaccounts.recover/import-multiaccount {:passphrase (get-in db [:multiaccounts/key-storage :seed-phrase])
+                                                          :password nil
+                                                          :success-event ::import-multiaccount-success}}))
+
+(fx/defn handle-multiaccount-import
+  {:events [::import-multiaccount-success]}
+  [{:keys [db] :as cofx} root-data derived-data]
+  (fx/merge cofx
+            {:db (update db :intro-wizard
+                         assoc :root-key root-data
+                         :derived derived-data
+                         :selected-storage-type :advanced
+                         :encrypt-with-password? true
+                         :passphrase-error nil
+                         :weak-password? true
+                         :passphrase (get-in db [:multiaccounts/key-storage :seed-phrase]))}
+            (navigation/navigate-to-cofx :intro-stack {:screen :keycard-onboarding-intro})))
+
+;; How to handle this?
+(fx/defn handle-delete-multiaccount-error
+  {:events [::delete-multiaccount-error]}
+  [_ _]
+  {})
 
 (comment
   (mnemonic/sanitize-passphrase "rocket rebel pasta kimchi kitty nani tokyo")
   (native-module/multiaccount-import-mnemonic "rocket mixed rebel affair umbrella legal resemble scene virus park deposit cargo" nil
                                               (fn [result]
                                                 (prn (types/json->clj result))))
+
+
+  (native-module/delete-multiaccount "0x3831d0f22996a65970a214f0a94bfa9a63a21dac235d8dadb91be8e32e7d3ab7" (fn [result]
+                                                                                                       (prn ::--rich-comment-res-> result)))
   )
+
 
 

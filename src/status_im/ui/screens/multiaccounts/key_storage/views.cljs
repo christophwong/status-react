@@ -156,10 +156,10 @@
                        :right        [quo/button
                                       {:type     :secondary
                                        :disabled (not keycard-storage-selected?)
-                                       :on-press #(re-frame/dispatch [::multiaccounts.key-storage/transfer-to-keycard-confirmed])}
+                                       :on-press #(re-frame/dispatch [::multiaccounts.key-storage/show-transfer-warning-popup])}
                                       "Confirm"]}]]]))
 
-(defview seed-key-uid-mistmatch-popup []
+(defview seed-key-uid-mismatch-popover []
   [react/view
    [react/view {:margin-top        24
                 :margin-horizontal 24
@@ -192,6 +192,43 @@
                   :type                :secondary}
       (i18n/label :t/cancel)]]]])
 
+(defview transfer-multiaccount-warning-popover []
+  [react/view
+   [react/view {:margin-top        24
+                :margin-horizontal 24
+                :align-items       :center}
+    [react/view {:width           32
+                 :height          32
+                 :border-radius   16
+                 :align-items     :center
+                 :justify-content :center}
+     [vector-icons/icon :main-icons/tiny-warning-background {:color colors/red}]]
+    [react/text {:style {:typography    :title-bold
+                         :margin-top    8
+                         :margin-bottom 8}}
+     "Move keystore file to keycard?"]
+    [react/view {:flex-wrap       :wrap
+                 :flex-direction  :row
+                 :justify-content :center
+                 :text-align      :center}
+     [react/nested-text
+      {:style {:color       colors/gray
+               :text-align  :center
+               :line-height 22}}
+      ;; (i18n/label :t/custom-seed-phrase-text-1)
+      "Database will be reset. Chats, contacts and settings will be deleted"]]
+    [react/view {:margin-vertical 24
+                 :align-items     :center}
+     [quo/button {:on-press            #(re-frame/dispatch [::multiaccounts.key-storage/delete-multiaccount-and-init-keycard-onboarding])
+                  :accessibility-label :cancel-custom-seed-phrase
+                  :type                :primary
+                  :theme               :negative}
+      "Move and Reset"]
+     [quo/button {:on-press            #(re-frame/dispatch [:hide-popover])
+                  :accessibility-label :cancel-custom-seed-phrase
+                  :type                :secondary}
+      (i18n/label :t/cancel)]]]])
+
 (comment
   (-> re-frame.db/app-db deref keys)
   (-> re-frame.db/app-db deref
@@ -200,7 +237,6 @@
   (-> re-frame.db/app-db
       deref
       :multiaccounts/key-storage)
-
 
   ;; UI flow
   (do
@@ -221,7 +257,7 @@
 
     ;; valid seed for Trusty Candid Bighornedsheep
     ;; If you try to select Dim Venerated Yaffle, but use this seed instead, validate-seed-against-key-uid will fail miserably
-    (re-frame/dispatch [::multiaccounts.key-storage/seed-phrase-input-changed
+    #_(re-frame/dispatch [::multiaccounts.key-storage/seed-phrase-input-changed
                         (status-im.utils.security/mask-data "disease behave roof exile ghost head carry item tumble census rocket champion")])
 
     ;; valid seed for Dim Venerated Yaffle (this is just a test account, okay to leak seed)
@@ -234,7 +270,20 @@
     ;; Choose Keycard from storage options
     (re-frame/dispatch [::multiaccounts.key-storage/keycard-storage-pressed true])
 
-    ;; Confirm migration
-    (re-frame/dispatch [::multiaccounts.key-storage/transfer-to-keycard-confirmed])
+    ;; Confirm migration popup
+    (re-frame/dispatch [::multiaccounts.key-storage/show-transfer-warning-popup])
+
+    ;; Delete multiaccount and init keycard onboarding
+    (re-frame/dispatch [::multiaccounts.key-storage/delete-multiaccount-and-init-keycard-onboarding])
     )
-  )
+
+  ;; Flow to populate state after multiaccount is deleted
+  (do
+    ;; set seed phrase
+    (re-frame/dispatch [:set-in [:multiaccounts/key-storage :seed-phrase] "rocket mixed rebel affair umbrella legal resemble scene virus park deposit cargo"])
+
+    ;; simulate delete multiaccount success
+    (re-frame/dispatch [::multiaccounts.key-storage/delete-multiaccount-success])
+    
+    )
+)
