@@ -1332,5 +1332,21 @@
     "default-assets": "Default ERC20 and ERC721",
     "increase-gas": "Increase Gas",
     "cancelling": "Cancelling",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "move-and-reset": "Move and Reset",
+    "move-keystore-file-to-keycard": "Move keystore file to keycard?",
+    "database-reset-warning": "Database will be reset. Chats, contacts and settings will be deleted",
+    "empty-keycard-required": "Requires an empty Keycard",
+    "current": "Current",
+    "choose-storage": "Choose storage",
+    "choose-new-location-for-keystore": "Choose a new location to save your keystore file",
+    "get-a-keycard": "Get a Keycard",
+    "keycard-upsell-subtitle": "Your portable, easy to use hardware wallet",
+    "actions": "Actions",
+    "move-keystore-file": "Move keystore file",
+    "select-new-location-for-keys": "Select a new location to save your private key(s)",
+    "reset-database": "Reset database",
+    "reset-database-warning": "Delete chats, contacts and settings. Required when you’ve lost your password",
+    "key-managment": "Key management",
+    "choose-actions": "Choose actions"
 }

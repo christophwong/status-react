@@ -19,7 +19,7 @@
             [status-im.utils.platform :as platform]))
 
 (defn local-topbar [subtitle]
-  [topbar/topbar {:title    "Key management"
+  [topbar/topbar {:title   (i18n/label :t/key-managment)
                   :subtitle subtitle}])
 
 ;; Component to render Key and Storage management screen
@@ -27,7 +27,7 @@
   (letsubs [{:keys [name] :as multiaccount} [:multiaccounts/login]
             {:keys [move-keystore-checked?]} [:multiaccounts/key-storage]]
            [react/view {:flex 1}
-            [local-topbar "Choose actions"]
+            [local-topbar (i18n/label :t/choose-actions)]
             [accordion/section {:title   name
                                 :icon    [chat-icon.screen/contact-icon-contacts-tab
                                           (multiaccounts/displayed-photo multiaccount)]
@@ -37,15 +37,15 @@
                          :flex-direction  :column
                          :justify-content :space-between}
              [react/view
-              [quo/list-header "Actions"]
-              [quo/list-item {:title              "Move keystore file"
-                              :subtitle           "Select a new location to save your private key(s)"
+              [quo/list-header (i18n/label :t/actions)]
+              [quo/list-item {:title              (i18n/label :t/move-keystore-file)
+                              :subtitle           (i18n/label :t/select-new-location-for-keys)
                               :subtitle-max-lines 4
                               :accessory          :checkbox
                               :active             move-keystore-checked?
                               :on-press           #(re-frame/dispatch [::multiaccounts.key-storage/move-keystore-checked (not move-keystore-checked?)])}]
-              [quo/list-item {:title              "Reset database"
-                              :subtitle           "Delete chats, contacts and settings. Required when you’ve lost your password"
+              [quo/list-item {:title              (i18n/label :t/reset-database)
+                              :subtitle           (i18n/label :t/reset-database-warning)
                               :subtitle-max-lines 4
                               :disabled           true
                               :active             move-keystore-checked?
@@ -62,20 +62,20 @@
 (defn actions-not-logged-in
   "To be used when the flow is accessed before login, will enter seed phrase next"
   []
-  [actions-base {:next-title "Enter seed phrase"
+  [actions-base {:next-title (i18n/label :t/enter-seed-phrase)
                  :next-event [::multiaccounts.key-storage/enter-seed-pressed]}])
 
 (defn actions-logged-in
   "To be used when the flow is accessed from profile, will choose storage next"
   []
-  [actions-base {:next-title "Choose storage"
+  [actions-base {:next-title (i18n/label :t/choose-storage)
                  :next-event [::multiaccounts.key-storage/choose-storage-pressed]}])
 
 (defview seed-phrase []
   (letsubs
    [{:keys [seed-word-count seed-shape-invalid?]} [:multiaccounts/key-storage]]
    [react/keyboard-avoiding-view {:flex 1}
-    [local-topbar "Enter seed phrase"]
+    [local-topbar (i18n/label :t/enter-seed-phrase)]
     [multiaccounts.views/seed-phrase-input
      {:on-change-event     [::multiaccounts.key-storage/seed-phrase-input-changed]
       :seed-word-count     seed-word-count
@@ -91,11 +91,11 @@
                                       :disabled seed-shape-invalid?
                                       :on-press #(re-frame/dispatch [::multiaccounts.key-storage/choose-storage-pressed])
                                       :after    :main-icons/next}
-                                     "Choose storage"]}]]))
+                                     (i18n/label :t/choose-storage)]}]]))
 
 (defn keycard-subtitle []
   [react/view
-   [react/text {:style {:color colors/gray}} "Requires an empty Keycard"]
+   [react/text {:style {:color colors/gray}} (i18n/label :t/empty-keycard-required)]
    [react/view {:flex-direction :row
                 :align-items    :center}
     [react/text {:style               {:color colors/blue}
@@ -122,42 +122,43 @@
                 :margin-left 12}
     [react/text {:style {:font-size 20
                          :font-weight "700"}}
-     "Get a Keycard"]
-    [react/text
-     "Your portable, easy to use hardware wallet"]]])
+     (i18n/label :t/get-a-keycard)]
+    [react/view {:style {:opacity 0.7}}
+     [react/text
+      (i18n/label :t/keycard-upsell-subtitle)]]]])
 
 (defview storage []
   (letsubs
-   [{:keys [keycard-storage-selected?]} [:multiaccounts/key-storage]]
-   [react/view {:flex 1}
-    [local-topbar "Choose storage"]
-    [react/view {:style styles/help-text-container}
-     [react/text {:style styles/help-text}
-      "Choose a new location to save your keystore file"]]
-    [react/view
-     [quo/list-header "Current"]
-     [quo/list-item {:title     "This device"
-                     :text-size :base
-                     :icon      :main-icons/mobile
-                     :disabled  true}]
-     [quo/list-header "New"]
-     [quo/list-item {:title              "Keycard"
-                     :subtitle           "Requires an empty Keycard"
-                     :subtitle-max-lines 4
-                     :icon               :main-icons/keycard
-                     :active             keycard-storage-selected?
-                     :on-press           #(re-frame/dispatch [::multiaccounts.key-storage/keycard-storage-pressed (not keycard-storage-selected?)])
-                     :accessory          :radio}]]
-    [react/view {:flex            1
-                 :justify-content :flex-end}
-     (when-not keycard-storage-selected?
-       [keycard-upsell-banner])
-     [toolbar/toolbar {:show-border? true
-                       :right        [quo/button
-                                      {:type     :secondary
-                                       :disabled (not keycard-storage-selected?)
-                                       :on-press #(re-frame/dispatch [::multiaccounts.key-storage/show-transfer-warning-popup])}
-                                      "Confirm"]}]]]))
+      [{:keys [keycard-storage-selected?]} [:multiaccounts/key-storage]]
+    [react/view {:flex 1}
+     [local-topbar (i18n/label :t/choose-storage)]
+     [react/view {:style styles/help-text-container}
+      [react/text {:style styles/help-text}
+       (i18n/label :t/choose-new-location-for-keystore)]]
+     [react/view
+      [quo/list-header (i18n/label :t/current)]
+      [quo/list-item {:title     (i18n/label :t/this-device)
+                      :text-size :base
+                      :icon      :main-icons/mobile
+                      :disabled  true}]
+      [quo/list-header (i18n/label :t/new)]
+      [quo/list-item {:title              (i18n/label :t/keycard)
+                      :subtitle           (i18n/label :t/empty-keycard-required)
+                      :subtitle-max-lines 4
+                      :icon               :main-icons/keycard
+                      :active             keycard-storage-selected?
+                      :on-press           #(re-frame/dispatch [::multiaccounts.key-storage/keycard-storage-pressed (not keycard-storage-selected?)])
+                      :accessory          :radio}]]
+     [react/view {:flex            1
+                  :justify-content :flex-end}
+      (when-not keycard-storage-selected?
+        [keycard-upsell-banner])
+      [toolbar/toolbar {:show-border? true
+                        :right        [quo/button
+                                       {:type     :secondary
+                                        :disabled (not keycard-storage-selected?)
+                                        :on-press #(re-frame/dispatch [::multiaccounts.key-storage/show-transfer-warning-popup])}
+                                       (i18n/label :t/confirm)]}]]]))
 
 (defview seed-key-uid-mismatch-popover []
   [react/view
@@ -206,7 +207,7 @@
     [react/text {:style {:typography    :title-bold
                          :margin-top    8
                          :margin-bottom 8}}
-     "Move keystore file to keycard?"]
+     (i18n/label :t/move-keystore-file-to-keycard)]
     [react/view {:flex-wrap       :wrap
                  :flex-direction  :row
                  :justify-content :center
@@ -215,15 +216,14 @@
       {:style {:color       colors/gray
                :text-align  :center
                :line-height 22}}
-      ;; (i18n/label :t/custom-seed-phrase-text-1)
-      "Database will be reset. Chats, contacts and settings will be deleted"]]
+      (i18n/label :t/database-reset-warning)]]
     [react/view {:margin-vertical 24
                  :align-items     :center}
      [quo/button {:on-press            #(re-frame/dispatch [::multiaccounts.key-storage/delete-multiaccount-and-init-keycard-onboarding])
                   :accessibility-label :cancel-custom-seed-phrase
                   :type                :primary
                   :theme               :negative}
-      "Move and Reset"]
+      (i18n/label :t/move-and-reset)]
      [quo/button {:on-press            #(re-frame/dispatch [:hide-popover])
                   :accessibility-label :cancel-custom-seed-phrase
                   :type                :secondary}
@@ -279,9 +279,12 @@
 
   ;; Flow to populate state after multiaccount is deleted
   (do
-    ;; set seed phrase
+    ;; set seed phrase for Dim Venerated Yaffle
     (re-frame/dispatch [:set-in [:multiaccounts/key-storage :seed-phrase] "rocket mixed rebel affair umbrella legal resemble scene virus park deposit cargo"])
 
+    ;; set seed for Trusty Candid Bighornedsheep
+    #_(re-frame/dispatch [:set-in [:multiaccounts/key-storage :seed-phrase] "disease behave roof exile ghost head carry item tumble census rocket champion"])
+    
     ;; simulate delete multiaccount success
     (re-frame/dispatch [::multiaccounts.key-storage/delete-multiaccount-success])
     
