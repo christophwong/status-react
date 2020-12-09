@@ -145,14 +145,13 @@ We don't need to take the exact steps, just set the required state and redirect 
   {:events [::import-multiaccount-success]}
   [{:keys [db] :as cofx} root-data derived-data]
   (fx/merge cofx
-            {:db (update db :intro-wizard
-                         assoc :root-key root-data
-                         :derived derived-data
-                         :selected-storage-type :advanced
-                         :encrypt-with-password? true
-                         :passphrase-error nil
-                         :weak-password? true
-                         :passphrase (get-in db [:multiaccounts/key-storage :seed-phrase]))}
+            {:db  (-> db
+                      (update :intro-wizard
+                              assoc :root-key root-data
+                              :derived derived-data
+                              :selected-storage-type :advanced)
+                      (assoc-in [:keycard :flow] :recovery)
+                      (dissoc :multiaccounts/key-storage))}
             (navigation/navigate-to-cofx :intro-stack {:screen :keycard-onboarding-intro})))
 
 ;; How to handle this?
@@ -168,8 +167,9 @@ We don't need to take the exact steps, just set the required state and redirect 
                                                 (prn (types/json->clj result))))
 
 
-  (native-module/delete-multiaccount "0x3831d0f22996a65970a214f0a94bfa9a63a21dac235d8dadb91be8e32e7d3ab7" (fn [result]
-                                                                                                       (prn ::--rich-comment-res-> result)))
+  (native-module/delete-multiaccount "0x3831d0f22996a65970a214f0a94bfa9a63a21dac235d8dadb91be8e32e7d3ab7"
+                                     (fn [result]
+                                       (prn ::--rich-comment-res-> result)))
   )
 
 
