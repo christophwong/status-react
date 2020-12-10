@@ -20,8 +20,8 @@
     (get contacts public-key
          (public-key->new-contact public-key))))
 
-(defn- contact-by-address [[_ contact] address]
-  (when (ethereum/address= (:address contact) address)
+(defn- contact-by-address [[addr contact] address]
+  (when (ethereum/address= addr address)
     contact))
 
 (defn find-contact-by-address [contacts address]
