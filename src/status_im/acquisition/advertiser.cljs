@@ -1,9 +1,11 @@
 (ns status-im.acquisition.advertiser
   (:require [status-im.utils.fx :as fx]
+            [status-im.i18n :as i18n]
             [status-im.popover.core :as popover]
             [status-im.ethereum.core :as ethereum]
             [status-im.acquisition.gateway :as gateway]
             [status-im.acquisition.claim :as claim]
+            [status-im.notifications.core :as notifications]
             [status-im.acquisition.persistance :as persistence]))
 
 (fx/defn start-acquisition
@@ -21,9 +23,14 @@
                   :invite_code referral}]
     (fx/merge cofx
               (if (= decision :accept)
-                (gateway/handle-acquisition {:message    payload
-                                             :method     "PATCH"
-                                             :url        [:clicks referral]
-                                             :on-success [::claim/success-starter-pack-claim]})
+                (fn [cofx]
+                  (fx/merge cofx
+                            {::notifications/local-notifications
+                             {:title   (i18n/label :t/starter-pack-coming)
+                              :message (i18n/label :t/starter-pack-coming-description)}}
+                            (gateway/handle-acquisition {:message    payload
+                                                         :method     "PATCH"
+                                                         :url        [:clicks referral]
+                                                         :on-success [::claim/success-starter-pack-claim]})))
                 {::persistence/set-referrer-state :declined})
               (popover/hide-popover))))
