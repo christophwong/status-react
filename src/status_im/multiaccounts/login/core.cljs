@@ -75,7 +75,7 @@
 (fx/defn login
   {:events [:multiaccounts.login.ui/password-input-submitted]}
   [{:keys [db]}]
-  (let [{:keys [key-uid password name photo-path]} (:multiaccounts/login db)]
+  (let [{:keys [key-uid password name identicon]} (:multiaccounts/login db)]
     {:db (-> db
              (assoc-in [:multiaccounts/login :processing] true)
              (dissoc :intro-wizard)
@@ -83,7 +83,7 @@
      ::login [key-uid
               (types/clj->json {:name       name
                                 :key-uid    key-uid
-                                :photo-path photo-path})
+                                :identicon  identicon})
               (ethereum/sha3 (security/safe-unmask-data password))]}))
 
 (fx/defn finish-keycard-setup
