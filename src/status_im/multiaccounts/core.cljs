@@ -57,6 +57,8 @@
         (str "@" (or username ens-name)))
       (or alias (gfycat/generate-gfy public-key)))))
 
+(def photo-quality "large")
+
 (defn displayed-photo
   "If a photo, a image or an images array is set use it, otherwise fallback on identicon or generate"
   [{:keys [image images photo-path identicon public-key]}]
@@ -65,7 +67,7 @@
     (get image :uri)
 
     (pos? (count images))
-    (let [image (first images)]
+    (let [image (first (filter #(= (:type %) photo-quality) images))]
       (or (get image :url)
           (get image :uri)))
 
