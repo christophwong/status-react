@@ -101,7 +101,7 @@
         [message-content-image (:image content) false]]])))
 
 (defn message-item [account]
-  (fn [{:keys [content-type content from timestamp identicon outgoing] :as message}
+  (fn [{:keys [content-type content from timestamp outgoing] :as message}
        {:keys [modal on-long-press close-modal]}]
     [react/view (merge {:padding-vertical   8
                         :flex-direction     :row
@@ -114,8 +114,8 @@
                       (re-frame/dispatch [:chat.ui/show-profile-without-adding-contact from]))}
       [react/view {:padding-top 2 :padding-right 8}
        (if outgoing
-         [photos/member-identicon (multiaccounts/displayed-photo account)]
-         [photos/member-identicon identicon])]]
+         [photos/account-photo account]
+         [photos/member-photo from])]]
      [react/view {:flex 1}
       [react/view {:flex-direction  :row
                    :justify-content :space-between}

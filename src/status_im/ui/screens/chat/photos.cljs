@@ -22,6 +22,12 @@
     [photo path {:size                style/default-size
                  :accessibility-label :member-photo}]))
 
+(defn account-photo [account]
+  (let [path (multiaccounts/displayed-photo account)]
+    [photo path {:size                style/default-size
+                 :accessibility-label :own-account-photo}]))
+
+
 (defn member-identicon [identicon]
   (let [size style/default-size]
     [react/view {:style (style/photo-container size)}
