@@ -2,6 +2,8 @@
   (:require [re-frame.core :as re-frame]
             [status-im.i18n :as i18n]
             [status-im.utils.fx :as fx]
+            [status-im.ethereum.tokens :as tokens]
+            [status-im.ui.components.react :as react]
             [status-im.acquisition.claim :as claim]
             [status-im.ethereum.core :as ethereum]
             [status-im.acquisition.persistance :as persistence]
@@ -51,8 +53,9 @@
     (fx/merge cofx
               {:db (update db :acquisition dissoc :chat-referrer)
                ::notifications/local-notifications
-               {:title (i18n/label :t/starter-pack-coming)
-                :message (i18n/label :t/starter-pack-coming-description)}}
+               {:title   (i18n/label :t/starter-pack-coming)
+                :message (i18n/label :t/starter-pack-coming-description)
+                :icon    (:uri (react/resolve-asset-source tokens/snt-icon-source))}}
               (when (= type public-chat)
                 (join-public-chat id))
               (gateway/handle-acquisition {:message    payload

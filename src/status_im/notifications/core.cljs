@@ -58,12 +58,10 @@
 
 (re-frame/reg-fx
  ::local-notification
- (fn [{:keys [title message]}]
+ (fn [props]
    (if platform/ios?
-     (local/local-push-ios {:title   title
-                            :message message})
-     (local/local-push-android {:title   title
-                                :message message}))))
+     (local/local-push-ios props)
+     (local/local-push-android props))))
 
 (re-frame/reg-fx
  ::enable
