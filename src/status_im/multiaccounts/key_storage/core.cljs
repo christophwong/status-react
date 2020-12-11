@@ -53,16 +53,16 @@
 
 (defn validate-seed-against-key-uid
   "Check if the key-uid was generated with the given seed-phrase"
-  [{:keys [seed-phrase key-uid]}]
+  [{:keys [seed-phrase key-uid success-event error-event]}]
   (native-module/multiaccount-import-mnemonic
    seed-phrase nil
    (fn [result]
      (let [{:keys [keyUid]} (types/json->clj result)]
        ;; if the key-uid from app-db is same as the one returned by multiaccount import,
        ;; it means that this seed was used to generate this multiaccount
-       (if (= key-uid keyUid)
-         (re-frame/dispatch [:navigate-to :storage])
-         (re-frame/dispatch [::show-seed-key-uid-mismatch-error-popup]))))))
+       (re-frame/dispatch (if (= key-uid keyUid)
+                            success-event
+                            error-event))))))
 
 (re-frame/reg-fx
  ::validate-seed-against-key-uid
@@ -80,7 +80,9 @@
       (popover/show-popover cofx {:view :custom-seed-phrase})
       {::validate-seed-against-key-uid {:seed-phrase (-> db :multiaccounts/key-storage :seed-phrase)
                                         ;; Unique key-uid of the account for which we are going to move keys
-                                        :key-uid (-> db :multiaccounts/login :key-uid)}})))
+                                        :key-uid (-> db :multiaccounts/login :key-uid)
+                                        :success-event [:navigate-to :storage]
+                                        :error-event [::show-seed-key-uid-mismatch-error-popup]}})))
 
 (fx/defn choose-storage-pressed
   {:events [::choose-storage-pressed]}
