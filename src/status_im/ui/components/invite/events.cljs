@@ -52,7 +52,7 @@
  (fn [[chat-id acquisition]]
    (let [{:keys [flow-state]}  acquisition
          {:keys [attributed]
-          :as   chat-referrer} (get-in acquisition [:acquisition :chat-referrer chat-id])]
+          :as   chat-referrer} (get-in acquisition [:chat-referrer chat-id])]
      (and chat-referrer
           (not attributed)
           (or (= flow-state (get persistence/referrer-state :accepted))
