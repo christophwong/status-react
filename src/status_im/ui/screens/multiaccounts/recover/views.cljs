@@ -1,5 +1,5 @@
 (ns status-im.ui.screens.multiaccounts.recover.views
-  (:require-macros [status-im.utils.views :refer [defview]])
+  (:require-macros [status-im.utils.views :refer [defview letsubs]])
   (:require [re-frame.core :as re-frame]
             [status-im.ui.components.react :as react]
             [status-im.multiaccounts.recover.core :as multiaccounts.recover]
@@ -43,39 +43,45 @@
                   :type                :secondary}
       (i18n/label :t/cancel)]]]])
 
-(defn bottom-sheet-view []
-  [react/view {:flex 1 :flex-direction :row}
-   [react/view {:flex 1}
-    [quo/list-item
-     {:theme               :accent
-      :title               (i18n/label :t/manage-keys-and-storage)
-      :accessibility-label :enter-seed-phrase-button
-      :icon                :main-icons/key
-      :on-press            #(hide-sheet-and-dispatch [::multiaccounts.key-storage/key-and-storage-management-pressed])}]
+(defview bottom-sheet-view []
+  (letsubs [view-id [:view-id]
+            acc-to-login-keycard-pairing [::multiaccounts.recover/acc-to-login-keycard-pairing]]
+    [react/view {:flex 1 :flex-direction :row}
+     [react/view {:flex 1}
+      ;; Show manage storage link when on login screen
+      ;; and the selected account is not paied with keycard
+      (when (and (= view-id :login)
+                 (not acc-to-login-keycard-pairing))
+        [quo/list-item
+         {:theme               :accent
+          :title               (i18n/label :t/manage-keys-and-storage)
+          :accessibility-label :enter-seed-phrase-button
+          :icon                :main-icons/key
+          :on-press            #(hide-sheet-and-dispatch [::multiaccounts.key-storage/key-and-storage-management-pressed])}])
 
-    [quo/list-item
-     {:theme               :accent
-      :title               (i18n/label :t/enter-seed-phrase)
-      :accessibility-label :enter-seed-phrase-button
-      :icon                :main-icons/text
-      :on-press            #(hide-sheet-and-dispatch [::multiaccounts.recover/enter-phrase-pressed])}]
-    (when (or platform/android?
-              config/keycard-test-menu-enabled?)
       [quo/list-item
        {:theme               :accent
-        :title               (i18n/label :t/recover-with-keycard)
-        :accessibility-label :recover-with-keycard-button
-        :icon                [react/view {:border-width     1
-                                          :border-radius    20
-                                          :border-color     colors/blue-light
-                                          :background-color colors/blue-light
-                                          :justify-content  :center
-                                          :align-items      :center
-                                          :width            40
-                                          :height           40}
-                              [react/image {:source (resources/get-image :keycard-logo-blue)
-                                            :style  {:width 24 :height 24}}]]
-        :on-press            #(hide-sheet-and-dispatch [::keycard/recover-with-keycard-pressed])}])]])
+        :title               (i18n/label :t/enter-seed-phrase)
+        :accessibility-label :enter-seed-phrase-button
+        :icon                :main-icons/text
+        :on-press            #(hide-sheet-and-dispatch [::multiaccounts.recover/enter-phrase-pressed])}]
+      (when (or platform/android?
+                config/keycard-test-menu-enabled?)
+        [quo/list-item
+         {:theme               :accent
+          :title               (i18n/label :t/recover-with-keycard)
+          :accessibility-label :recover-with-keycard-button
+          :icon                [react/view {:border-width     1
+                                            :border-radius    20
+                                            :border-color     colors/blue-light
+                                            :background-color colors/blue-light
+                                            :justify-content  :center
+                                            :align-items      :center
+                                            :width            40
+                                            :height           40}
+                                [react/image {:source (resources/get-image :keycard-logo-blue)
+                                              :style  {:width 24 :height 24}}]]
+          :on-press            #(hide-sheet-and-dispatch [::keycard/recover-with-keycard-pressed])}])]]))
 
 (def bottom-sheet
   {:content bottom-sheet-view})
@@ -108,8 +114,5 @@
 
     ;; Turn notifications later
     (re-frame/dispatch [:navigate-to :welcome])
-
-    ;; Logout
-    (re-frame/dispatch [:multiaccounts.logout.ui/logout-confirmed])
     )
   )

@@ -1348,5 +1348,8 @@
     "reset-database": "Reset database",
     "reset-database-warning": "Delete chats, contacts and settings. Required when you’ve lost your password",
     "key-managment": "Key management",
-    "choose-actions": "Choose actions"
+    "choose-actions": "Choose actions",
+    "master-account": "Master account",
+    "back-up": "Back up",
+    "key-on-device": "Private key is saved on this device"
 }

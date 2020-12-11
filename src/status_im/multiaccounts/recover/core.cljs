@@ -266,3 +266,17 @@
             (set-phrase input)
             (count-words)
             (run-validation)))
+
+(defn login-ma-keycard-pairing
+  "Compute the keycard-pairing value of the multiaccount selected for login"
+  [db _]
+  (when-let [acc-to-login (-> db :multiaccounts/login)]
+    (-> db
+        :multiaccounts/multiaccounts
+        (get (:key-uid acc-to-login))
+        :keycard-pairing)))
+
+(re-frame/reg-sub
+ ::acc-to-login-keycard-pairing
+ login-ma-keycard-pairing)
+

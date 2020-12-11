@@ -14,13 +14,44 @@
             [status-im.ui.components.toolbar :as toolbar]
             [status-im.ui.components.accordion :as accordion]
             [status-im.ui.screens.multiaccounts.views :as multiaccounts.views]
-            [status-im.ui.screens.multiaccounts.key-storage.styles :as styles]
-            [status-im.utils.config :as config]
-            [status-im.utils.platform :as platform]))
+            [status-im.ui.screens.multiaccounts.key-storage.styles :as styles]))
 
 (defn local-topbar [subtitle]
   [topbar/topbar {:title   (i18n/label :t/key-managment)
                   :subtitle subtitle}])
+
+(defonce accordian-data
+  [{:id    :type
+    :label (i18n/label :t/type)
+    :value (i18n/label :t/master-account)}
+   {:id    :back-up
+    :label (i18n/label :t/back-up)
+    :value (i18n/label :t/recovery-phrase)}
+   {:id    :path
+    :label (i18n/label :t/derivation-path)
+    ;; derivation path of the profile
+    :value "m/43'/60'/1581'/0'/0"}
+   {:id    :storage
+    :label (i18n/label :t/storage)
+    :value (i18n/label :t/key-on-device)}])
+
+(defn accordion-content []
+  [react/view {:padding-horizontal 16
+               :flex-direction     :row}
+   [react/view {:flex-shrink  0
+                :margin-right 20}
+    (for [{:keys [id label]} accordian-data]
+      ^{:key (str "left-" id)}
+      [react/text {:style {:color colors/gray
+                           :padding-vertical 8}} label])]
+
+   [react/view {:flex 1}
+    (for [{:keys [id value]} accordian-data]
+      ^{:key (str "right-" id)}
+      [react/text {:flex      1
+                   :flex-wrap :wrap
+                   :style {:padding-vertical 8}}
+       value])]])
 
 ;; Component to render Key and Storage management screen
 (defview actions-base [{:keys [next-title next-event]}]
@@ -32,7 +63,7 @@
                                 :icon    [chat-icon.screen/contact-icon-contacts-tab
                                           (multiaccounts/displayed-photo multiaccount)]
                                 :count   0
-                                :content [react/text :acc-text]}]
+                                :content [accordion-content]}]
             [react/view {:flex            1
                          :flex-direction  :column
                          :justify-content :space-between}
@@ -88,7 +119,8 @@
     [toolbar/toolbar {:show-border? true
                       :right        [quo/button
                                      {:type     :secondary
-                                      :disabled seed-shape-invalid?
+                                      :disabled (or seed-shape-invalid?
+                                                    (nil? seed-shape-invalid?))
                                       :on-press #(re-frame/dispatch [::multiaccounts.key-storage/choose-storage-pressed])
                                       :after    :main-icons/next}
                                      (i18n/label :t/choose-storage)]}]]))
@@ -106,8 +138,9 @@
                                                   :width  16
                                                   :height 16}]]])
 
+@colors/theme
 (defn keycard-upsell-banner []
-  [react/view {:background-color "#2C5955" ;; TODO(shivekkhurana): This should be themed, #DDF8F4 for light mode
+  [react/view {:background-color (if (= :dark @colors/theme) "#2C5955" "#DDF8F4")
                :border-radius 16
                :margin 16
                :padding-horizontal 12
@@ -123,9 +156,8 @@
     [react/text {:style {:font-size 20
                          :font-weight "700"}}
      (i18n/label :t/get-a-keycard)]
-    [react/view {:style {:opacity 0.7}}
-     [react/text
-      (i18n/label :t/keycard-upsell-subtitle)]]]])
+    [react/text {:style {:color (colors/alpha colors/text 0.8)}}
+     (i18n/label :t/keycard-upsell-subtitle)]]])
 
 (defview storage []
   (letsubs
@@ -259,6 +291,10 @@
     ;; If you try to select Dim Venerated Yaffle, but use this seed instead, validate-seed-against-key-uid will fail miserably
     #_(re-frame/dispatch [::multiaccounts.key-storage/seed-phrase-input-changed
                         (status-im.utils.security/mask-data "disease behave roof exile ghost head carry item tumble census rocket champion")])
+
+    ;; valid seed for Swiffy Warlike Seagull
+    #_(re-frame/dispatch [::multiaccounts.key-storage/seed-phrase-input-changed
+                        (status-im.utils.security/mask-data "dirt agent garlic merge tuna leaf congress hedgehog absent dish pizza scrap")])
 
     ;; valid seed for Dim Venerated Yaffle (this is just a test account, okay to leak seed)
     (re-frame/dispatch [::multiaccounts.key-storage/seed-phrase-input-changed

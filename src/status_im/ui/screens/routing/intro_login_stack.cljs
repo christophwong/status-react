@@ -3,7 +3,6 @@
   (:require [status-im.ui.screens.multiaccounts.login.views :as login]
             [status-im.ui.screens.progress.views :as progress]
             [status-im.ui.screens.multiaccounts.views :as multiaccounts]
-            [status-im.ui.screens.multiaccounts.key-storage.views :as key-storage]
             [status-im.ui.screens.intro.views :as intro]
             [status-im.ui.screens.keycard.onboarding.views :as keycard.onboarding]
             [status-im.ui.screens.keycard.recovery.views :as keycard.recovery]

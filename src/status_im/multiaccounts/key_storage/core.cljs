@@ -152,6 +152,7 @@ We don't need to take the exact steps, just set the required state and redirect 
                               :selected-storage-type :advanced)
                       (assoc-in [:keycard :flow] :recovery)
                       (dissoc :multiaccounts/key-storage))}
+            (popover/hide-popover)
             (navigation/navigate-to-cofx :intro-stack {:screen :keycard-onboarding-intro})))
 
 ;; How to handle this?
