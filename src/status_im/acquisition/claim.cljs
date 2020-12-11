@@ -1,18 +1,17 @@
 (ns status-im.acquisition.claim
-  (:require [status-im.i18n :as i18n]
-            [status-im.utils.fx :as fx]
+  (:require [status-im.utils.fx :as fx]
             [status-im.ethereum.transactions.core :as transaction]
-            [status-im.notifications.core :as notifications]
+            [status-im.acquisition.notifications :as notifications]
             [status-im.acquisition.persistance :as persistence]
             [status-im.ethereum.json-rpc :as json-rpc]
             [re-frame.core :as re-frame]))
 
 (fx/defn success-tx-received
   {:events [::success-tx-received]}
-  [_]
-  {::persistence/set-referrer-state   :claimed
-   ::notifications/local-notification {:title   (i18n/label :t/starter-pack-received)
-                                       :message (i18n/label :t/starter-pack-received-description)}})
+  [cofx]
+  (fx/merge cofx
+            (notifications/claimed)
+            {::persistence/set-referrer-state :claimed}))
 
 (fx/defn add-tx-watcher
   {:events [::add-tx-watcher]}
@@ -42,5 +41,4 @@
   (fx/merge cofx
             {::persistence/set-referrer-state (if tx :accepted :claimed)}
             (when tx
-              (add-tx-watcher tx))
-            (notifications/request-permission)))
+              (add-tx-watcher tx))))

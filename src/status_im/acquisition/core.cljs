@@ -5,6 +5,7 @@
             [status-im.ethereum.core :as ethereum]
             [status-im.ethereum.ens :as ens]
             [status-im.ethereum.contracts :as contracts]
+            [status-im.notifications.core :as notifications]
             [status-im.acquisition.chat :as chat]
             [status-im.acquisition.dapp :as dapp]
             [status-im.acquisition.claim :as claim]
@@ -58,7 +59,8 @@
   [{:keys [db] :as cofx} referrer {:keys [type attributed] :as referrer-meta}]
   (when-not attributed
     (fx/merge cofx
-              {:db (assoc-in db [:acquisition :metadata] referrer-meta)}
+              {:db (assoc-in db [:acquisition :metadata] referrer-meta)
+               ::notifications/create-channel nil}
               (cond
                 (= type advertiser-type)
                 (advertiser/start-acquisition referrer-meta)

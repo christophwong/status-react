@@ -1,13 +1,10 @@
 (ns status-im.acquisition.chat
   (:require [re-frame.core :as re-frame]
-            [status-im.i18n :as i18n]
             [status-im.utils.fx :as fx]
-            [status-im.ethereum.tokens :as tokens]
-            [status-im.ui.components.react :as react]
             [status-im.acquisition.claim :as claim]
             [status-im.ethereum.core :as ethereum]
             [status-im.acquisition.persistance :as persistence]
-            [status-im.notifications.core :as notifications]
+            [status-im.acquisition.notifications :as notifications]
             [status-im.acquisition.gateway :as gateway]
             [status-im.chat.models :as chat]
             [status-im.navigation :as navigation]))
@@ -51,11 +48,8 @@
                            :address     (ethereum/default-address db)
                            :invite_code referral}]
     (fx/merge cofx
-              {:db (update db :acquisition dissoc :chat-referrer)
-               ::notifications/local-notifications
-               {:title   (i18n/label :t/starter-pack-coming)
-                :message (i18n/label :t/starter-pack-coming-description)
-                :icon    (:uri (react/resolve-asset-source tokens/snt-icon-source))}}
+              {:db (update db :acquisition dissoc :chat-referrer)}
+              (notifications/accept)
               (when (= type public-chat)
                 (join-public-chat id))
               (gateway/handle-acquisition {:message    payload

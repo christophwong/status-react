@@ -1,13 +1,10 @@
 (ns status-im.acquisition.advertiser
   (:require [status-im.utils.fx :as fx]
-            [status-im.i18n :as i18n]
-            [status-im.ethereum.tokens :as tokens]
-            [status-im.ui.components.react :as react]
             [status-im.popover.core :as popover]
             [status-im.ethereum.core :as ethereum]
             [status-im.acquisition.gateway :as gateway]
             [status-im.acquisition.claim :as claim]
-            [status-im.notifications.core :as notifications]
+            [status-im.acquisition.notifications :as notifications]
             [status-im.acquisition.persistance :as persistence]))
 
 (fx/defn start-acquisition
@@ -27,10 +24,7 @@
               (if (= decision :accept)
                 (fn [cofx]
                   (fx/merge cofx
-                            {::notifications/local-notifications
-                             {:title   (i18n/label :t/starter-pack-coming)
-                              :message (i18n/label :t/starter-pack-coming-description)
-                              :icon    (:uri (react/resolve-asset-source tokens/snt-icon-source))}}
+                            (notifications/accept)
                             (gateway/handle-acquisition {:message    payload
                                                          :method     "PATCH"
                                                          :url        [:clicks referral]
