@@ -48,7 +48,6 @@
                            :address     (ethereum/default-address db)
                            :invite_code referral}]
     (fx/merge cofx
-              {:db (update db :acquisition dissoc :chat-referrer)}
               (notifications/accept)
               (when (= type public-chat)
                 (join-public-chat id))

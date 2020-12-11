@@ -5,6 +5,7 @@
             [status-im.i18n :as i18n]
             [status-im.notifications.core :as notifications]
             [status-im.ui.components.react :as react]
+            [quo.platform :as platform]
             [status-im.ethereum.tokens :as tokens]))
 
 (def channel-id "status-im-referrals")
@@ -12,8 +13,9 @@
 (re-frame/reg-fx
  ::create-channel
  (fn []
-   (pn-android/create-channel {:channel-id   channel-id
-                               :channel-name "Status referrals push notifications"})))
+   (when platform/android?
+     (pn-android/create-channel {:channel-id   channel-id
+                                 :channel-name "Status referrals push notifications"}))))
 
 (fx/defn accept
   [_]

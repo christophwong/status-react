@@ -5,7 +5,7 @@
             [status-im.ethereum.core :as ethereum]
             [status-im.ethereum.ens :as ens]
             [status-im.ethereum.contracts :as contracts]
-            [status-im.notifications.core :as notifications]
+            [status-im.acquisition.notifications :as notifications]
             [status-im.acquisition.chat :as chat]
             [status-im.acquisition.dapp :as dapp]
             [status-im.acquisition.claim :as claim]
