@@ -61,20 +61,14 @@
 
 (defn displayed-photo
   "If a photo, a image or an images array is set use it, otherwise fallback on identicon or generate"
-  [{:keys [image images photo-path identicon public-key]}]
+  [{:keys [images identicon public-key]}]
   (cond
-    (map? image)
-    (get image :uri)
-
     (pos? (count images))
     (let [image (first (filter #(= (:type %) photo-quality) images))]
       (or (get image :url)
           (get image :uri)))
 
-    (boolean photo-path)
-    photo-path
-
-    (boolean identicon)
+    (not (string/blank? identicon))
     identicon
 
     :else
@@ -179,7 +173,8 @@
                                  :params     [key-uid (clean-path path) ax ay bx by]
                                  ;; NOTE: In case of an error we can show a toast error
                                  :on-success #(re-frame/dispatch [::update-local-picture %])}]}
-              (multiaccounts.update/optimistic :images [{:url path}])
+              (multiaccounts.update/optimistic :images [{:url  path
+                                                         :type photo-quality}])
               (bottom-sheet/hide-bottom-sheet))))
 
 (fx/defn delete-profile-picture

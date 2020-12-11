@@ -17,7 +17,6 @@
             [status-im.ui.screens.chat.photos :as photos]
             [status-im.ui.components.tabs :as tabs]
             [status-im.utils.contenthash :as contenthash]
-            [status-im.multiaccounts.core :as multiaccounts]
             [status-im.ui.screens.chat.message.reactions :as reactions]
             [status-im.chat.models.reactions :as models.reactions]
             [status-im.ui.screens.chat.components.reply :as components.reply]

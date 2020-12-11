@@ -54,7 +54,7 @@
   [members admins contacts {:keys [public-key] :as current-account}]
   (let [current-contact (some->
                          current-account
-                         (select-keys [:name :preferred-name :public-key :photo-path])
+                         (select-keys [:name :preferred-name :public-key :identicon])
                          (clojure.set/rename-keys {:name           :alias
                                                    :preferred-name :name}))
         all-contacts    (cond-> contacts

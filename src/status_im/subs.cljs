@@ -273,9 +273,9 @@
  :intro-wizard/recovery-success
  :<- [:intro-wizard]
  (fn [wizard-state]
-   {:pubkey (get-in wizard-state [:derived constants/path-whisper-keyword :public-key])
-    :name (get-in wizard-state [:derived constants/path-whisper-keyword :name])
-    :photo-path (get-in wizard-state [:derived constants/path-whisper-keyword :photo-path])
+   {:pubkey      (get-in wizard-state [:derived constants/path-whisper-keyword :public-key])
+    :name        (get-in wizard-state [:derived constants/path-whisper-keyword :name])
+    :identicon   (get-in wizard-state [:derived constants/path-whisper-keyword :identicon])
     :processing? (:processing? wizard-state)}))
 
 (re-frame/reg-sub
@@ -475,7 +475,7 @@
  (fn [current-account]
    (some->
     current-account
-    (select-keys [:name :preferred-name :public-key :photo-path])
+    (select-keys [:name :preferred-name :public-key :identicon :image :images])
     (clojure.set/rename-keys {:name :alias})
     (multiaccounts/contact-with-names))))
 
@@ -955,14 +955,13 @@
  :<- [:chats/mentionable-contacts]
  :<- [:contacts/blocked-set]
  :<- [:multiaccount]
- (fn [[{:keys [users]} contacts blocked {:keys [name preferred-name photo-path public-key]}]]
+ (fn [[{:keys [users]} contacts blocked {:keys [name preferred-name public-key]}]]
    (apply dissoc
           (-> users
               (merge contacts)
               (assoc public-key (mentions/add-searchable-phrases
                                  {:alias      name
                                   :name       (or preferred-name name)
-                                  :identicon  photo-path
                                   :public-key public-key})))
           blocked)))
 
@@ -1842,7 +1841,7 @@
 (re-frame/reg-sub
  :contacts/contact-by-address
  :<- [:contacts/contacts]
- :<- [:multiaccount]
+ :<- [:multiaccount/contact]
  (fn [[contacts multiaccount] [_ address]]
    (if (ethereum/address= address (:public-key multiaccount))
      multiaccount
