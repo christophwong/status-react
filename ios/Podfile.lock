@@ -70,7 +70,7 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
-  - Keycard (3.0.0):
+  - Keycard (3.0.4):
     - CryptoSwift
     - secp256k1
   - OpenSSL-Universal (1.0.2.20):
@@ -368,7 +368,7 @@ PODS:
     - React
   - RNSVG (9.13.6):
     - React
-  - secp256k1 (0.1.4)
+  - secp256k1 (0.1.6)
   - SQLCipher (3.4.2):
     - SQLCipher/standard (= 3.4.2)
   - SQLCipher/common (3.4.2)
@@ -612,10 +612,10 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   Keycard:
-    :commit: b06ae123c9dd6bbd251b8287e43724b39654b3af
+    :commit: 6b0669fb6901525bed351d3ce4da6071f803b95f
     :git: https://github.com/status-im/Keycard.swift.git
   secp256k1:
-    :commit: 1dcac13e9d88e6b71b094cdc58c1706e26cefa3b
+    :commit: 46a1fa30d9b8babeae85ff519050f42394ab5fcc
     :git: https://github.com/status-im/secp256k1.swift.git
     :submodules: true
 
@@ -637,7 +637,7 @@ SPEC CHECKSUMS:
   FlipperKit: afd4259ef9eadeeb2d30250b37d95cb3b6b97a69
   Folly: 30e7936e1c45c08d884aa59369ed951a8e68cf51
   glog: d6cca0516fb0ca3697a5b2e199ea83dfc7133411
-  Keycard: 793197f4817a953ec21cb6c0173ea5a722deb0e6
+  Keycard: dd96182888da0aacf4de821b641103143bbb26cc
   OpenSSL-Universal: ff34003318d5e1163e9529b08470708e389ffcdd
   Permission-Camera: afad27bf90337684d4a86f3825112d648c8c4d3b
   Permission-Microphone: 0ffabc3fe1c75cfb260525ee3f529383c9f4368c
@@ -660,7 +660,7 @@ SPEC CHECKSUMS:
   react-native-shake: de052eaa3eadc4a326b8ddd7ac80c06e8d84528c
   react-native-slider: 12bd76d3d568c9c5500825db54123d44b48e4ad4
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
-  react-native-status-keycard: 53efad2ddf47eb7b2aed836a4cf13e93080da696
+  react-native-status-keycard: 817dfb0b7f0ab8c0450b901f7e6ddc867f5435bd
   react-native-webview: 4e96d493f9f90ba4f03b28933f30b2964df07e39
   React-RCTActionSheet: f41ea8a811aac770e0cc6e0ad6b270c644ea8b7c
   React-RCTAnimation: 49ab98b1c1ff4445148b72a3d61554138565bad0
@@ -689,7 +689,7 @@ SPEC CHECKSUMS:
   RNReanimated: 89f5e0a04d1dd52fbf27e7e7030d8f80a646a3fc
   RNScreens: b748efec66e095134c7166ca333b628cd7e6f3e2
   RNSVG: 8ba35cbeb385a52fd960fd28db9d7d18b4c2974f
-  secp256k1: 42ccf84e5c7add5e8edbce1f1891fd4d93b9623f
+  secp256k1: f61d67e6fdcb85fd727acf1bf35ace6036db540c
   SQLCipher: f9fcf29b2e59ced7defc2a2bdd0ebe79b40d4990
   SSZipArchive: 62d4947b08730e4cda640473b0066d209ff033c9
   TOCropViewController: da59f531f8ac8a94ef6d6c0fc34009350f9e8bfe
@@ -697,6 +697,6 @@ SPEC CHECKSUMS:
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: fc06398d521f795387d4f599a7ca9cb38a6a9294
+PODFILE CHECKSUM: 8895658b9c26f8c9762516d5a2408c1b2d1246ea
 
 COCOAPODS: 1.9.3
